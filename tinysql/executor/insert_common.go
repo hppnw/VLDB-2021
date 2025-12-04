@@ -668,7 +668,11 @@ func (e *InsertValues) addRecord(ctx context.Context, row []types.Datum) (int64,
 	var recordID int64
 	// Hint: step II.5
 	// YOUR CODE HERE (lab4)
-	panic("YOUR CODE HERE")
+	row, err = e.getRow(ctx, row)
+	if err != nil {
+		return 0, err
+	}
+	recordID, err = e.Table.AddRecord(e.ctx, row)
 	txn.DelOption(kv.PresumeKeyNotExists)
 	if err != nil {
 		return 0, err

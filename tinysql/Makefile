@@ -272,6 +272,8 @@ lab3: failpoint-enable
 	@$(FAILPOINT_DISABLE)
 
 
+lab4: lab4a lab4b lab4c
+
 lab4a: 
 	go test -timeout 600s ./server -check.f ^testSuiteLab4A$
 	go test -timeout 600s ./session -check.f ^lab4ASessionSuite$
