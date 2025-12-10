@@ -705,6 +705,10 @@ const (
 
 func (p *peer) inspect(req *raft_cmdpb.RaftCmdRequest) (RequestPolicy, error) {
 	if req.AdminRequest != nil {
+		// Check CmdType first to ensure correct identification
+		if req.AdminRequest.CmdType == raft_cmdpb.AdminCmdType_TransferLeader {
+			return RequestPolicy_ProposeTransferLeader, nil
+		}
 		if GetChangePeerCmd(req) != nil {
 			return RequestPolicy_ProposeConfChange, nil
 		}

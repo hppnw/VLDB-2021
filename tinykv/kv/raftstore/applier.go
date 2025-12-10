@@ -541,6 +541,34 @@ func (a *applier) applyRaftCmd(aCtx *applyContext, index, term uint64,
 		aCtx.wb.RollbackToSafePoint()
 		if _, ok := err.(*util.ErrEpochNotMatch); ok {
 			log.Debug(fmt.Sprintf("epoch not match region_id %d, peer_id %d, err %v", a.region.Id, a.id, err))
+		} else if _, ok := err.(*util.ErrKeyNotInRegion); ok {
+			// For write operations (Put/Delete), key not in region after split is normal, just ignore it
+			// For read operations (Get), we should return the error to the client
+			isWriteOp := false
+			if req.AdminRequest == nil && len(req.Requests) > 0 {
+				for _, r := range req.Requests {
+					if r.CmdType == raft_cmdpb.CmdType_Put || r.CmdType == raft_cmdpb.CmdType_Delete {
+						isWriteOp = true
+						break
+					}
+				}
+			}
+			if isWriteOp {
+				// Write operation: ignore key not in region after split
+				log.Debug(fmt.Sprintf("key not in region after split (write op) region_id %d, peer_id %d, err %v", a.region.Id, a.id, err))
+				resp = newCmdResp()
+				applyResult.tp = applyResultTypeNone
+			} else {
+				// Read operation: return error to client
+				log.Debug(fmt.Sprintf("key not in region (read op) region_id %d, peer_id %d, err %v", a.region.Id, a.id, err))
+				// Ensure error is set in response
+				if resp == nil {
+					resp = ErrResp(err)
+				} else {
+					BindRespError(resp, err)
+				}
+				applyResult.tp = applyResultTypeNone
+			}
 		} else {
 			log.Error(fmt.Sprintf("execute raft command region_id %d, peer_id %d, err %v", a.region.Id, a.id, err))
 		}
@@ -548,8 +576,10 @@ func (a *applier) applyRaftCmd(aCtx *applyContext, index, term uint64,
 			txn.Discard()
 			txn = nil
 		}
-		resp = ErrResp(err)
-		applyResult.tp = applyResultTypeNone
+		if resp == nil {
+			resp = ErrResp(err)
+			applyResult.tp = applyResultTypeNone
+		}
 	}
 	a.applyState = aCtx.execCtx.applyState
 	aCtx.execCtx = nil

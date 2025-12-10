@@ -639,19 +639,10 @@ func (d *peerMsgHandler) proposeRaftCommand(msg *raft_cmdpb.RaftCmdRequest, cb *
 	// The peer that is being checked is a leader. It might step down to be a follower later. It
 	// doesn't matter whether the peer is a leader or not. If it's not a leader, the proposing
 	// command log entry can't be committed. There are some useful information in the `ctx` of the `peerMsgHandler`.
-	data, err := msg.Marshal()
-	if err != nil {
-		cb.Done(ErrResp(err))
+	errResp := &raft_cmdpb.RaftCmdResponse{}
+	if !d.peer.Propose(d.ctx.engine.Kv, d.ctx.cfg, cb, msg, errResp) {
+		// Propose failed, callback has been called
 		return
-	}
-	d.applyProposals = append(d.applyProposals, &proposal{
-		index: d.nextProposalIndex(),
-		term:  d.Term(),
-		cb:    cb,
-	})
-	err = d.RaftGroup.Propose(data)
-	if err != nil {
-		cb.Done(ErrResp(err))
 	}
 }
 
