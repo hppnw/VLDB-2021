@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
     name: Autograding
-    runs-on: [self-hosted,X64]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: PingCAP-QE/setup-go@pingcap
