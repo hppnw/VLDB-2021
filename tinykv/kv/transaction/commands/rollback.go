@@ -47,7 +47,6 @@ func rollbackKey(key []byte, txn *mvcc.MvccTxn, response interface{}) (interface
 		zap.Uint64("startTS", txn.StartTS),
 		zap.String("key", hex.EncodeToString(key)))
 
-	panic("rollbackKey is not implemented yet")
 	if lock == nil || lock.Ts != txn.StartTS {
 		// There is no lock, check the write status.
 		existingWrite, ts, err := txn.CurrentWrite(key)
@@ -63,7 +62,9 @@ func rollbackKey(key []byte, txn *mvcc.MvccTxn, response interface{}) (interface
 		// There is no write either, presumably the prewrite was lost. We insert a rollback write anyway.
 		if existingWrite == nil {
 			// YOUR CODE HERE (lab2).
-
+			// No write record exists, insert a rollback record
+			write := mvcc.Write{StartTS: txn.StartTS, Kind: mvcc.WriteKindRollback}
+			txn.PutWrite(key, txn.StartTS, &write)
 			return nil, nil
 		} else {
 			if existingWrite.Kind == mvcc.WriteKindRollback {

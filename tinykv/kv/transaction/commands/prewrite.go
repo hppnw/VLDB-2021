@@ -70,17 +70,74 @@ func (p *Prewrite) prewriteMutation(txn *mvcc.MvccTxn, mut *kvrpcpb.Mutation) (*
 	// Hint: Check the interafaces provided by `mvcc.MvccTxn`. The error type `kvrpcpb.WriteConflict` is used
 	//		 denote to write conflict error, try to set error information properly in the `kvrpcpb.KeyError`
 	//		 response.
-	panic("prewriteMutation is not implemented yet")
+	// Check if there's a rollback record for this transaction
+	currentWrite, _, err := txn.CurrentWrite(key)
+	if err != nil {
+		return nil, err
+	}
+	if currentWrite != nil && currentWrite.Kind == mvcc.WriteKindRollback {
+		// This transaction has been rolled back
+		keyError := &kvrpcpb.KeyError{
+			Abort: "transaction has been rolled back",
+		}
+		return keyError, nil
+	}
+	
+	write, commitTs, err := txn.MostRecentWrite(key)
+	if err != nil {
+		return nil, err
+	}
+	if write != nil && commitTs > txn.StartTS {
+		// Write conflict: there's a more recent write
+		keyError := &kvrpcpb.KeyError{
+			Conflict: &kvrpcpb.WriteConflict{
+				StartTs:    txn.StartTS,
+				ConflictTs: commitTs,
+				Key:        key,
+				Primary:    p.request.PrimaryLock,
+			},
+		}
+		return keyError, nil
+	}
 
 	// YOUR CODE HERE (lab2).
 	// Check if key is locked. Report key is locked error if lock does exist, note the key could be locked
 	// by this transaction already and the current prewrite request is stale.
-	panic("check lock in prewrite is not implemented yet")
+	lock, err := txn.GetLock(key)
+	if err != nil {
+		return nil, err
+	}
+	if lock != nil {
+		if lock.Ts != txn.StartTS {
+			// Key is locked by another transaction
+			keyError := &kvrpcpb.KeyError{Locked: lock.Info(key)}
+			return keyError, nil
+		}
+		// Key is already locked by this transaction (stale request), just return success
+		return nil, nil
+	}
 
 	// YOUR CODE HERE (lab2).
 	// Write a lock and value.
 	// Hint: Check the interfaces provided by `mvccTxn.Txn`.
-	panic("lock record generation is not implemented yet")
+	lockKind := mvcc.WriteKindPut
+	if mut.Op == kvrpcpb.Op_Del {
+		lockKind = mvcc.WriteKindDelete
+	}
+	
+	lockObj := &mvcc.Lock{
+		Primary: p.request.PrimaryLock,
+		Ts:      txn.StartTS,
+		Ttl:     p.request.LockTtl,
+		Kind:    lockKind,
+	}
+	txn.PutLock(key, lockObj)
+	
+	if mut.Op == kvrpcpb.Op_Put {
+		txn.PutValue(key, mut.Value)
+	} else if mut.Op == kvrpcpb.Op_Del {
+		txn.DeleteValue(key)
+	}
 
 	return nil, nil
 }
