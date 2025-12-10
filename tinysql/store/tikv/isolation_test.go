@@ -73,6 +73,7 @@ func (s *testIsolationSuite) SetWithRetry(c *C, k, v []byte) writeRecord {
 			}
 		}
 		c.Assert(kv.IsTxnRetryableError(err) || terror.ErrorEqual(err, terror.ErrResultUndetermined), IsTrue)
+		time.Sleep(time.Microsecond * 100)
 	}
 }
 
@@ -100,6 +101,7 @@ func (s *testIsolationSuite) GetWithRetry(c *C, k []byte) readRecord {
 			}
 		}
 		c.Assert(kv.IsTxnRetryableError(err), IsTrue)
+		time.Sleep(time.Microsecond * 100)
 	}
 }
 
@@ -173,6 +175,7 @@ func (s *testIsolationSuite) TestReadWriteConflict(c *C) {
 				mu.Lock()
 				reads = append(reads, r)
 				mu.Unlock()
+				time.Sleep(time.Microsecond * 5)
 			}
 		}()
 	}
