@@ -1,0 +1,45 @@
+{
+  "tests": [
+    {
+      "name": "Lab 2 Part 1",
+      "setup": "cd tinykv && make lab2P1",
+      "run": "cd tinykv && make lab2P1",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 25
+    },
+    {
+      "name": "Lab 2 Part 2",
+      "setup": "cd tinykv && make lab2P2",
+      "run": "cd tinykv && make lab2P2",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 25
+    },
+    {
+      "name": "Lab 2 Part 3",
+      "setup": "cd tinykv && make lab2P3",
+      "run": "cd tinykv && make lab2P3",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 25
+    },
+    {
+      "name": "Lab 2 Part 4",
+      "setup": "cd tinykv && make lab2P4",
+      "run": "cd tinykv && make lab2P4",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 25
+    }
+  ]
+}
+
