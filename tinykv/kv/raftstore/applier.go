@@ -606,7 +606,13 @@ func (a *applier) execAdminCmd(aCtx *applyContext, req *raft_cmdpb.RaftCmdReques
 	case raft_cmdpb.AdminCmdType_CompactLog:
 		adminResp, result, err = a.execCompactLog(aCtx, adminReq)
 	case raft_cmdpb.AdminCmdType_TransferLeader:
-		err = errors.New("transfer leader won't execute")
+		// TransferLeader command should not enter apply phase normally, but if it does,
+		// we should return success since the transfer has already been handled in propose phase
+		adminResp = &raft_cmdpb.AdminResponse{
+			CmdType:       raft_cmdpb.AdminCmdType_TransferLeader,
+			TransferLeader: &raft_cmdpb.TransferLeaderResponse{},
+		}
+		result = applyResult{tp: applyResultTypeNone}
 	case raft_cmdpb.AdminCmdType_InvalidAdmin:
 		err = errors.New("unsupported command type")
 	}
