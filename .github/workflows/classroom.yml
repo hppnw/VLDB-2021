@@ -6,13 +6,67 @@ jobs:
   build:
     name: Autograding
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      checks: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
         with:
           go-version: '1.19'
-      - uses: you06/autograding@go
+      
+      # Lab 1: Storage and log layer in TinyKV
+      - name: Run Lab 1 Part 0
+        working-directory: tinykv
+        run: make lab1P0
+      - name: Run Lab 1 Part 1a
+        working-directory: tinykv
+        run: make lab1P1a
+      - name: Run Lab 1 Part 1b
+        working-directory: tinykv
+        run: make lab1P1b
+      - name: Run Lab 1 Part 2a
+        working-directory: tinykv
+        run: make lab1P2a
+      - name: Run Lab 1 Part 2b
+        working-directory: tinykv
+        run: make lab1P2b
+      - name: Run Lab 1 Part 3a
+        working-directory: tinykv
+        run: make lab1P3a
+      - name: Run Lab 1 Part 3b
+        working-directory: tinykv
+        run: make lab1P3b
+      - name: Run Lab 1 Part 4a
+        working-directory: tinykv
+        run: make lab1P4a
+      - name: Run Lab 1 Part 4b
+        working-directory: tinykv
+        run: make lab1P4b
+      
+      # Lab 2: Transaction layer in TinyKV
+      - name: Run Lab 2 Part 1
+        working-directory: tinykv
+        run: make lab2P1
+      - name: Run Lab 2 Part 2
+        working-directory: tinykv
+        run: make lab2P2
+      - name: Run Lab 2 Part 3
+        working-directory: tinykv
+        run: make lab2P3
+      - name: Run Lab 2 Part 4
+        working-directory: tinykv
+        run: make lab2P4
+      
+      # Lab 3: Percolator protocol in TinySQL
+      - name: Run Lab 3
+        working-directory: tinysql
+        run: make lab3
+      
+      # Lab 4: SQL execution layer in TinySQL
+      - name: Run Lab 4a
+        working-directory: tinysql
+        run: make lab4a
+      - name: Run Lab 4b
+        working-directory: tinysql
+        run: make lab4b
+      - name: Run Lab 4c
+        working-directory: tinysql
+        run: make lab4c
