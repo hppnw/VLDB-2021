@@ -268,7 +268,7 @@ vectorized-bench:
 			-args "$(VB_FUNC)"
 
 lab3: failpoint-enable
-	go test -timeout 600s ./store/tikv
+	go test -timeout 600s ./store/tikv || { $(FAILPOINT_DISABLE); exit 1; }
 	@$(FAILPOINT_DISABLE)
 
 
