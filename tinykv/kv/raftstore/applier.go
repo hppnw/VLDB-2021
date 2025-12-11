@@ -577,8 +577,8 @@ func (a *applier) applyRaftCmd(aCtx *applyContext, index, term uint64,
 			txn = nil
 		}
 		if resp == nil {
-			resp = ErrResp(err)
-			applyResult.tp = applyResultTypeNone
+		resp = ErrResp(err)
+		applyResult.tp = applyResultTypeNone
 		}
 	}
 	a.applyState = aCtx.execCtx.applyState
