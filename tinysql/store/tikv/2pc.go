@@ -490,11 +490,23 @@ func (actionCommit) handleSingleBatch(c *twoPhaseCommitter, bo *Backoffer, batch
 		}
 	})
 	if err != nil {
+		// If we already have undeterminedErr (from RPC error), return it
+		if isPrimary && c.getUndeterminedErr() != nil {
+			return errors.Trace(c.getUndeterminedErr())
+		}
 		return errors.Trace(err)
 	}
 
 	// handle the response and error refer to actionPrewrite.handleSingleBatch
 	// YOUR CODE HERE (lab3).
+	if resp == nil {
+		// If resp is nil but err is nil, it might be a timeout that was retried
+		// For primary key, if we have undeterminedErr, return it
+		if isPrimary && c.getUndeterminedErr() != nil {
+			return errors.Trace(c.getUndeterminedErr())
+		}
+		return errors.Trace(ErrBodyMissing)
+	}
 	regionErr, err := resp.GetRegionError()
 	if err != nil {
 		return errors.Trace(err)
