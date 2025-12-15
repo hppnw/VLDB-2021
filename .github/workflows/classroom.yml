@@ -54,17 +54,11 @@ jobs:
       - name: Run Lab 2 Part 4
         working-directory: tinykv
         run: make lab2P4
-      - name: Benchmark TinyKV (RaftStore Performance)
-        working-directory: tinykv
-        run: make bench
       
       # Lab 3: Percolator protocol in TinySQL
       - name: Run Lab 3
         working-directory: tinysql
         run: make lab3
-      - name: Benchmark Lab 3 (2PC Performance)
-        working-directory: tinysql
-        run: make bench-lab3
       
       # Lab 4: SQL execution layer in TinySQL
       - name: Run Lab 4a
@@ -76,6 +70,3 @@ jobs:
       - name: Run Lab 4c
         working-directory: tinysql
         run: make lab4c
-      - name: Benchmark Lab 4 (Executor Performance)
-        working-directory: tinysql
-        run: make bench-lab4
