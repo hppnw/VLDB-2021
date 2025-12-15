@@ -131,6 +131,10 @@ func (s *RegionRequestSender) SendReqCtx(
 				continue
 			}
 		}
+		// Clear rpcError only when we successfully get a response without region error
+		if regionErr == nil {
+			s.rpcError = nil
+		}
 		return resp, rpcCtx, nil
 	}
 }
@@ -147,6 +151,9 @@ func (s *RegionRequestSender) sendReqToRegion(bo *Backoffer, ctx *RPCContext, re
 		}
 		return nil, true, nil
 	}
+	// Don't clear rpcError here - it should be cleared only when we successfully get a non-region-error response
+	// This is because if we had an RPC error and then retry successfully but get a region error,
+	// we still need to know about the original RPC error to set undeterminedErr
 	return
 }
 
