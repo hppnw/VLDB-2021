@@ -14,8 +14,24 @@
 package tikv
 
 import (
+	"os"
+	"testing"
+
 	. "github.com/pingcap/check"
+	"github.com/pingcap/tidb/util/logutil"
 )
+
+func TestMain(m *testing.M) {
+	logLevel := os.Getenv("log_level")
+	if logLevel == "" {
+		logLevel = "info"
+	}
+	err := logutil.InitZapLogger(logutil.NewLogConfig(logLevel, logutil.DefaultLogFormat, logutil.EmptyFileLogConfig, false))
+	if err != nil {
+		panic(err)
+	}
+	os.Exit(m.Run())
+}
 
 // OneByOneSuite is a suite, When with-tikv flag is true, there is only one storage, so the test suite have to run one by one.
 type OneByOneSuite struct{}

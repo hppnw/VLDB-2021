@@ -282,7 +282,7 @@ func (c *Cluster) LeaderOfRegion(regionID uint64) *metapb.Peer {
 }
 
 func (c *Cluster) GetRegion(key []byte) *metapb.Region {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 500; i++ {
 		region, _, _ := c.schedulerClient.GetRegion(context.TODO(), key)
 		if region != nil {
 			return region
