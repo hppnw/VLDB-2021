@@ -1,6 +1,8 @@
 package latches
 
 import (
+	"hash/fnv"
+	"sort"
 	"sync"
 
 	"github.com/pingcap-incubator/tinykv/kv/transaction/mvcc"
@@ -15,16 +17,18 @@ import (
 // only needed for writing. Only one thread can hold a latch at a time and all keys that a command might write must be locked
 // at once.
 //
-// Latching is implemented using a single map which maps keys to a Go WaitGroup. Access to this map is guarded by a mutex
-// to ensure that latching is atomic and consistent. Since the mutex is a global lock, it would cause intolerable contention
-// in a real system.
+// Latching is implemented using a set of slots, each guarding a subset of keys. This reduces contention compared to a single
+// global lock.
+
+const numSlots = 256
+
+type latchSlot struct {
+	sync.Mutex
+	latchMap map[string]*sync.WaitGroup
+}
 
 type Latches struct {
-	// Before modifying any property of a key, the thread must have the latch for that key. `Latches` maps each latched
-	// key to a WaitGroup. Threads who find a key locked should wait on that WaitGroup.
-	latchMap map[string]*sync.WaitGroup
-	// Mutex to guard latchMap. A thread must hold this mutex while it makes any change to latchMap.
-	latchGuard sync.Mutex
+	slots [numSlots]latchSlot
 	// An optional validation function, only used for testing.
 	Validation func(txn *mvcc.MvccTxn, keys [][]byte)
 }
@@ -33,19 +37,48 @@ type Latches struct {
 // between all threads.
 func NewLatches() *Latches {
 	l := new(Latches)
-	l.latchMap = make(map[string]*sync.WaitGroup)
+	for i := 0; i < numSlots; i++ {
+		l.slots[i].latchMap = make(map[string]*sync.WaitGroup)
+	}
 	return l
+}
+
+func (l *Latches) getSlotID(key []byte) int {
+	h := fnv.New32a()
+	h.Write(key)
+	return int(h.Sum32()) % numSlots
 }
 
 // AcquireLatches tries lock all Latches specified by keys. If this succeeds, nil is returned. If any of the keys are
 // locked, then AcquireLatches requires a WaitGroup which the thread can use to be woken when the lock is free.
 func (l *Latches) AcquireLatches(keysToLatch [][]byte) *sync.WaitGroup {
-	l.latchGuard.Lock()
-	defer l.latchGuard.Unlock()
+	// Identify involved slots
+	slotIDs := make(map[int]struct{})
+	for _, key := range keysToLatch {
+		slotIDs[l.getSlotID(key)] = struct{}{}
+	}
+
+	// Sort slot IDs to avoid deadlock
+	sortedSlots := make([]int, 0, len(slotIDs))
+	for id := range slotIDs {
+		sortedSlots = append(sortedSlots, id)
+	}
+	sort.Ints(sortedSlots)
+
+	// Lock slots
+	for _, id := range sortedSlots {
+		l.slots[id].Lock()
+	}
+	defer func() {
+		for _, id := range sortedSlots {
+			l.slots[id].Unlock()
+		}
+	}()
 
 	// Check none of the keys we want to write are locked.
 	for _, key := range keysToLatch {
-		if latchWg, ok := l.latchMap[string(key)]; ok {
+		slot := &l.slots[l.getSlotID(key)]
+		if latchWg, ok := slot.latchMap[string(key)]; ok {
 			// Return a wait group to wait on.
 			return latchWg
 		}
@@ -55,7 +88,8 @@ func (l *Latches) AcquireLatches(keysToLatch [][]byte) *sync.WaitGroup {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	for _, key := range keysToLatch {
-		l.latchMap[string(key)] = wg
+		slot := &l.slots[l.getSlotID(key)]
+		slot.latchMap[string(key)] = wg
 	}
 
 	return nil
@@ -64,17 +98,39 @@ func (l *Latches) AcquireLatches(keysToLatch [][]byte) *sync.WaitGroup {
 // ReleaseLatches releases the latches for all keys in keysToUnlatch. It will wakeup any threads blocked on one of the
 // latches. All keys in keysToUnlatch must have been locked together in one call to AcquireLatches.
 func (l *Latches) ReleaseLatches(keysToUnlatch [][]byte) {
-	l.latchGuard.Lock()
-	defer l.latchGuard.Unlock()
+	// Identify involved slots
+	slotIDs := make(map[int]struct{})
+	for _, key := range keysToUnlatch {
+		slotIDs[l.getSlotID(key)] = struct{}{}
+	}
+
+	// Sort slot IDs
+	sortedSlots := make([]int, 0, len(slotIDs))
+	for id := range slotIDs {
+		sortedSlots = append(sortedSlots, id)
+	}
+	sort.Ints(sortedSlots)
+
+	// Lock slots
+	for _, id := range sortedSlots {
+		l.slots[id].Lock()
+	}
+	defer func() {
+		for _, id := range sortedSlots {
+			l.slots[id].Unlock()
+		}
+	}()
 
 	first := true
 	for _, key := range keysToUnlatch {
+		slot := &l.slots[l.getSlotID(key)]
 		if first {
-			wg := l.latchMap[string(key)]
-			wg.Done()
-			first = false
+			if wg, ok := slot.latchMap[string(key)]; ok {
+				wg.Done()
+				first = false
+			}
 		}
-		delete(l.latchMap, string(key))
+		delete(slot.latchMap, string(key))
 	}
 }
 
