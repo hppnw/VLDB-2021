@@ -252,10 +252,10 @@ func (e *HashAggExec) initForParallelExec(ctx sessionctx.Context) {
 			outputChs:         e.partialOutputChs,
 			giveBackCh:        e.inputCh,
 			globalOutputCh:    e.finalOutputCh,
-			partialResultsMap: make(aggPartialResultMapper),
+			partialResultsMap: make(aggPartialResultMapper, 128),
 			groupByItems:      e.GroupByItems,
 			chk:               newFirstChunk(e.children[0]),
-			groupKey:          make([][]byte, 0, 8),
+			groupKey:          make([][]byte, 0, 16),
 		}
 
 		e.partialWorkers[i] = w
@@ -269,14 +269,14 @@ func (e *HashAggExec) initForParallelExec(ctx sessionctx.Context) {
 	for i := 0; i < finalConcurrency; i++ {
 		e.finalWorkers[i] = HashAggFinalWorker{
 			baseHashAggWorker:   newBaseHashAggWorker(e.ctx, e.finishCh, e.FinalAggFuncs, e.maxChunkSize),
-			partialResultMap:    make(aggPartialResultMapper),
+			partialResultMap:    make(aggPartialResultMapper, 128),
 			groupSet:            set.NewStringSet(),
 			inputCh:             e.partialOutputChs[i],
 			outputCh:            e.finalOutputCh,
 			finalResultHolderCh: make(chan *chunk.Chunk, 1),
 			rowBuffer:           make([]types.Datum, 0, e.Schema().Len()),
 			mutableRow:          chunk.MutRowFromTypes(retTypes(e)),
-			groupKeys:           make([][]byte, 0, 8),
+			groupKeys:           make([][]byte, 0, 16),
 		}
 		e.finalWorkers[i].finalResultHolderCh <- newFirstChunk(e)
 	}
@@ -381,7 +381,7 @@ func getGroupKey(ctx sessionctx.Context, input *chunk.Chunk, groupKey [][]byte, 
 		groupKey[i] = groupKey[i][:0]
 	}
 	for i := avlGroupKeyLen; i < numRows; i++ {
-		groupKey = append(groupKey, make([]byte, 0, 10*len(groupByItems)))
+		groupKey = append(groupKey, make([]byte, 0, 64))
 	}
 
 	for _, item := range groupByItems {

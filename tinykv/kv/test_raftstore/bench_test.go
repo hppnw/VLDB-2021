@@ -30,6 +30,11 @@ func BenchmarkRaftStore_BasicPut(b *testing.B) {
 		val := []byte(fmt.Sprintf("val_%d", i))
 		cluster.MustPut(key, val)
 	}
+	
+	// Report metrics
+	throughput := float64(b.N) / b.Elapsed().Seconds()
+	b.ReportMetric(throughput, "ops/sec")
+	b.ReportAllocs()
 }
 
 func BenchmarkRaftStore_ParallelPut(b *testing.B) {
@@ -56,6 +61,11 @@ func BenchmarkRaftStore_ParallelPut(b *testing.B) {
 			cluster.MustPut(key, val)
 		}
 	})
+	
+	// Report metrics
+	throughput := float64(b.N) / b.Elapsed().Seconds()
+	b.ReportMetric(throughput, "ops/sec")
+	b.ReportAllocs()
 }
 
 func BenchmarkRaftStore_Get(b *testing.B) {
@@ -81,4 +91,9 @@ func BenchmarkRaftStore_Get(b *testing.B) {
 		val := []byte(fmt.Sprintf("val_%d", i%1000))
 		cluster.MustGet(key, val)
 	}
+	
+	// Report metrics
+	throughput := float64(b.N) / b.Elapsed().Seconds()
+	b.ReportMetric(throughput, "ops/sec")
+	b.ReportAllocs()
 }

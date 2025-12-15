@@ -20,7 +20,7 @@ import (
 // Latching is implemented using a set of slots, each guarding a subset of keys. This reduces contention compared to a single
 // global lock.
 
-const numSlots = 256
+const numSlots = 128
 
 type latchSlot struct {
 	sync.Mutex
