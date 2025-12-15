@@ -1,66 +1,66 @@
-# Lab3 TinySQL Á½½×¶ÎÌá½»ÊµÏÖÓëÎÊÌâ½â¾ö
+# Lab3 TinySQL ä¸¤é˜¶æ®µæäº¤å®žçŽ°ä¸Žé—®é¢˜è§£å†³
 
-## Ò»¡¢ÈÎÎñÄ¿±êÓë²ð½â
-Lab3 Ö÷ÒªÄ¿±êÊÇÊµÏÖ·Ö²¼Ê½ÊÂÎñµÄÁ½½×¶ÎÌá½»£¨2PC£©Ð­Òé£¬°üÀ¨£º
-- Á½½×¶ÎÌá½»µÄºËÐÄÁ÷³Ì
-- Ö÷¼üÓë´Ó¼üµÄÇø·Ö´¦Àí
-- ´íÎóÓëÒì³£µÄ¾«È·´¦Àí
-- Í¨¹ýËùÓÐÏà¹Ø²âÊÔÓÃÀý
+## ä¸€ã€ä»»åŠ¡ç›®æ ‡ä¸Žæ‹†è§£
+Lab3 ä¸»è¦ç›®æ ‡æ˜¯å®žçŽ°åˆ†å¸ƒå¼äº‹åŠ¡çš„ä¸¤é˜¶æ®µæäº¤ï¼ˆ2PCï¼‰åè®®ï¼ŒåŒ…æ‹¬ï¼š
+- ä¸¤é˜¶æ®µæäº¤çš„æ ¸å¿ƒæµç¨‹
+- ä¸»é”®ä¸Žä»Žé”®çš„åŒºåˆ†å¤„ç†
+- é”™è¯¯ä¸Žå¼‚å¸¸çš„ç²¾ç¡®å¤„ç†
+- é€šè¿‡æ‰€æœ‰ç›¸å…³æµ‹è¯•ç”¨ä¾‹
 
-## ¶þ¡¢ÊµÏÖ²½Öè
-1. **2PC »ù±¾Á÷³ÌÊáÀí**
-   - Àí½âÁ½½×¶ÎÌá½»µÄÔ­Àí£ºprewrite¡¢commit Á½²½¡£
-   - Ã÷È·Ö÷¼üÓë´Ó¼üµÄ´¦Àí²îÒì¡£
-2. **´úÂëÊµÏÖ**
-   - ÔÚ 2pc.go ÖÐÊµÏÖ prewrite ºÍ commit Âß¼­¡£
-   - ´¦Àí RPC ´íÎó¡¢region ´íÎó¡¢Ð´Ð´³åÍ»µÈ¶àÖÖÒì³£¡£
-3. **²âÊÔÇý¶¯¿ª·¢**
-   - ·´¸´ÔËÐÐ store/tikv ÏÂµÄ²âÊÔÓÃÀý£¬¶¨Î»Ê§°Üµã¡£
-   - ½áºÏ failpoint ¿ò¼Ü×¢Èë´íÎó£¬ÑéÖ¤Òì³£´¦Àí¡£
+## äºŒã€å®žçŽ°æ­¥éª¤
+1. **2PC åŸºæœ¬æµç¨‹æ¢³ç†**
+   - ç†è§£ä¸¤é˜¶æ®µæäº¤çš„åŽŸç†ï¼šprewriteã€commit ä¸¤æ­¥ã€‚
+   - æ˜Žç¡®ä¸»é”®ä¸Žä»Žé”®çš„å¤„ç†å·®å¼‚ã€‚
+2. **ä»£ç å®žçŽ°**
+   - åœ¨ 2pc.go ä¸­å®žçŽ° prewrite å’Œ commit é€»è¾‘ã€‚
+   - å¤„ç† RPC é”™è¯¯ã€region é”™è¯¯ã€å†™å†™å†²çªç­‰å¤šç§å¼‚å¸¸ã€‚
+3. **æµ‹è¯•é©±åŠ¨å¼€å‘**
+   - åå¤è¿è¡Œ store/tikv ä¸‹çš„æµ‹è¯•ç”¨ä¾‹ï¼Œå®šä½å¤±è´¥ç‚¹ã€‚
+   - ç»“åˆ failpoint æ¡†æž¶æ³¨å…¥é”™è¯¯ï¼ŒéªŒè¯å¼‚å¸¸å¤„ç†ã€‚
 
-## Èý¡¢Óöµ½µÄÎÊÌâÓëµ÷ÊÔ¹ý³Ì
-### 1. ´íÎóÀàÐÍ²»Æ¥Åä
-- **ÏÖÏó**£º²âÊÔÆÚÍû·µ»Ø terror.ErrResultUndetermined£¬Êµ¼Ê·µ»ØÔ­Ê¼´íÎó»ò±» wrap ºóµÄ´íÎó¡£
-- **ÅÅ²é**£º·ÖÎö²âÊÔÓÃÀý£¬·¢ÏÖ terror.ErrorEqual ÅÐ¶ÏÊ§°Ü¡£
-- **½â¾ö**£ºÍ³Ò»ÓÃ terror.ErrResultUndetermined ±ê¼ÇÖ÷¼ü commit ½×¶ÎµÄÍøÂç/³¬Ê±´íÎó¡£
+## ä¸‰ã€é‡åˆ°çš„é—®é¢˜ä¸Žè°ƒè¯•è¿‡ç¨‹
+### 1. é”™è¯¯ç±»åž‹ä¸åŒ¹é…
+- **çŽ°è±¡**ï¼šæµ‹è¯•æœŸæœ›è¿”å›ž terror.ErrResultUndeterminedï¼Œå®žé™…è¿”å›žåŽŸå§‹é”™è¯¯æˆ–è¢« wrap åŽçš„é”™è¯¯ã€‚
+- **æŽ’æŸ¥**ï¼šåˆ†æžæµ‹è¯•ç”¨ä¾‹ï¼Œå‘çŽ° terror.ErrorEqual åˆ¤æ–­å¤±è´¥ã€‚
+- **è§£å†³**ï¼šç»Ÿä¸€ç”¨ terror.ErrResultUndetermined æ ‡è®°ä¸»é”® commit é˜¶æ®µçš„ç½‘ç»œ/è¶…æ—¶é”™è¯¯ã€‚
 
-### 2. undeterminedErr ±»¸²¸Ç
-- **ÏÖÏó**£º¶à´Î commit ÖØÊÔÊ±£¬undeterminedErr ±»ºóÐø´íÎó¸²¸Ç£¬µ¼ÖÂ²âÊÔÊ§°Ü¡£
-- **ÅÅ²é**£º¼ì²é setUndeterminedErr ÊµÏÖ£¬·¢ÏÖÎ´±£»¤Ê×´Î´íÎó¡£
-- **½â¾ö**£ºÖ»ÔÚ undeterminedErr Îª¿ÕÊ±ÉèÖÃ£¬±£Ö¤Ê×´Î´íÎóÀàÐÍ¡£
+### 2. undeterminedErr è¢«è¦†ç›–
+- **çŽ°è±¡**ï¼šå¤šæ¬¡ commit é‡è¯•æ—¶ï¼ŒundeterminedErr è¢«åŽç»­é”™è¯¯è¦†ç›–ï¼Œå¯¼è‡´æµ‹è¯•å¤±è´¥ã€‚
+- **æŽ’æŸ¥**ï¼šæ£€æŸ¥ setUndeterminedErr å®žçŽ°ï¼Œå‘çŽ°æœªä¿æŠ¤é¦–æ¬¡é”™è¯¯ã€‚
+- **è§£å†³**ï¼šåªåœ¨ undeterminedErr ä¸ºç©ºæ—¶è®¾ç½®ï¼Œä¿è¯é¦–æ¬¡é”™è¯¯ç±»åž‹ã€‚
 
-### 3. region ´íÎó´¦Àí²»µ±
-- **ÏÖÏó**£ºËùÓÐ region ´íÎó¶¼±»±ê¼ÇÎª undetermined£¬µ¼ÖÂÐ´Ð´³åÍ»²âÊÔÊ§°Ü¡£
-- **ÅÅ²é**£º¶Ô±È²âÊÔÓÃÀý£¬·¢ÏÖÖ»ÓÐÏÈÓöµ½ RPC ´íÎóºóÔÙÓöµ½ region ´íÎó²ÅÓ¦±ê¼Ç undetermined¡£
-- **½â¾ö**£ºÐÞÕýÂß¼­£¬½öÔÚÒÑ´æÔÚ undeterminedErr Ê± region ´íÎó²Å·µ»Ø undetermined¡£
+### 3. region é”™è¯¯å¤„ç†ä¸å½“
+- **çŽ°è±¡**ï¼šæ‰€æœ‰ region é”™è¯¯éƒ½è¢«æ ‡è®°ä¸º undeterminedï¼Œå¯¼è‡´å†™å†™å†²çªæµ‹è¯•å¤±è´¥ã€‚
+- **æŽ’æŸ¥**ï¼šå¯¹æ¯”æµ‹è¯•ç”¨ä¾‹ï¼Œå‘çŽ°åªæœ‰å…ˆé‡åˆ° RPC é”™è¯¯åŽå†é‡åˆ° region é”™è¯¯æ‰åº”æ ‡è®° undeterminedã€‚
+- **è§£å†³**ï¼šä¿®æ­£é€»è¾‘ï¼Œä»…åœ¨å·²å­˜åœ¨ undeterminedErr æ—¶ region é”™è¯¯æ‰è¿”å›ž undeterminedã€‚
 
-### 4. ²¢·¢²âÊÔËÀËøÓë³¬Ê±ÎÊÌâ£¨isolation_test.go£©
-- **ÏÖÏó**£ºGitHub Actions ÉÏ lab3 ²âÊÔ³¬Ê±Ê§°Ü£¨600Ãë£©£¬ÏÔÊ¾ "80 passed, 1 FAILED"£¬µ«±¾µØWSL²âÊÔÍ¨¹ý¡£´íÎó¶ÑÕ»ÏÔÊ¾´óÁ¿ goroutine ÔÚ `sync.Mutex.Lock` ºÍ `leveldb.(*DB).acquireSnapshot` ´¦×èÈû¡£
-- **¸ù±¾Ô­Òò**£º
-  1. `isolation_test.go` ÓÐ `// +build !race` ±êÇ©£¬µ¼ÖÂ²âÊÔÔÚ GitHub Actions ÉÏ±»Ìø¹ý£¬µ« check ¿ò¼ÜÈÔÍ³¼ÆÁËÕâÐ©²âÊÔ
-  2. `TestWriteWriteConflict` ²âÊÔÖÐ£¬10¸ö²¢·¢ goroutine ¸ßÆµµ÷ÓÃ `SetWithRetry` ºÍ `GetWithRetry`
-  3. ÖØÊÔÑ­»·ÖÐÃ»ÓÐÑÓ³Ù£¬µ¼ÖÂÎÞÏÞÖÆµÄ¸ßÆµÖØÊÔÔì³É leveldb Ëø¾ºÕù
-  4. ´íÎóÀàÐÍ¶ÏÑÔ¹ýÓÚÑÏ¸ñ£º`c.Assert(kv.IsTxnRetryableError(err) || terror.ErrorEqual(err, terror.ErrResultUndetermined), IsTrue)`£¬µ±³öÏÖÆäËûÀàÐÍ´íÎóÊ±Ö±½ÓÊ§°Ü¶ø²»ÊÇÖØÊÔ
-- **ÅÅ²é¹ý³Ì**£º
-  1. ·ÖÎö¶ÑÕ»¸ú×Ù£¬·¢ÏÖ goroutine ¿¨ÔÚ `newIterator -> db.NewIterator -> acquireSnapshot -> Mutex.Lock`
-  2. ·¢ÏÖ `SetFinalizer` Ò²ÔÚ¾ºÕùÍ¬Ò»¸öËø£¬µ¼ÖÂËÀËø
-  3. ²é¿´ GitHub Actions ÈÕÖ¾£¬·¢ÏÖ isolation_test ÖÐµÄ²âÊÔÍêÈ«Ã»ÓÐÔËÐÐ
-  4. È·ÈÏ `// +build !race` ±êÇ©µ¼ÖÂ²âÊÔ±»Ìø¹ý
-  5. ÔÚ test_results.txt ÖÐÕÒµ½Ê§°Üµã£º`TestWriteWriteConflict` µÄ´íÎó¶ÏÑÔÊ§°Ü
-- **½â¾ö·½°¸**£º
-  1. **ÒÆ³ý `// +build !race` ±êÇ©** - ÈÃ²âÊÔÔÚËùÓÐ»·¾³ÏÂ¶¼ÄÜÔËÐÐ
-  2. **ÔÚ `SetWithRetry` ÖØÊÔÑ­»·ÖÐÌí¼Ó 100 Î¢ÃëÑÓ³Ù** - ¼õÉÙËø¾ºÕùÆµÂÊ
-  3. **ÔÚ `GetWithRetry` ÖØÊÔÑ­»·ÖÐÌí¼Ó 100 Î¢ÃëÑÓ³Ù** - ¼õÉÙ²¢·¢Ñ¹Á¦
-  4. **ÔÚ `TestReadWriteConflict` µÄ¶ÁÈ¡Ñ­»·ÖÐÌí¼Ó 5 Î¢ÃëÑÓ³Ù** - ½µµÍ goroutine Ö®¼äµÄ¾ºÕù
-  5. **ÒÆ³ýÑÏ¸ñµÄ´íÎóÀàÐÍ¶ÏÑÔ** - ¸ÄÎªÔÚÈÎºÎ´íÎóÊ±¶¼ÖØÊÔ£¬¶ø²»ÊÇ¶ÏÑÔÊ§°Ü
-  6. **ÒÆ³ýÎ´Ê¹ÓÃµÄ imports**£¨`kv` ºÍ `terror` °ü£©- ÐÞ¸´±àÒë´íÎó
-  7. **ÐÞ¸´ Makefile** - Ìí¼Ó´íÎó´¦ÀíÈ·±£²âÊÔÊ§°ÜÊ±ÕýÈ·ÇåÀí failpoint
+### 4. å¹¶å‘æµ‹è¯•æ­»é”ä¸Žè¶…æ—¶é—®é¢˜ï¼ˆisolation_test.goï¼‰
+- **çŽ°è±¡**ï¼šGitHub Actions ä¸Š lab3 æµ‹è¯•è¶…æ—¶å¤±è´¥ï¼ˆ600ç§’ï¼‰ï¼Œæ˜¾ç¤º "80 passed, 1 FAILED"ï¼Œä½†æœ¬åœ°WSLæµ‹è¯•é€šè¿‡ã€‚é”™è¯¯å †æ ˆæ˜¾ç¤ºå¤§é‡ goroutine åœ¨ `sync.Mutex.Lock` å’Œ `leveldb.(*DB).acquireSnapshot` å¤„é˜»å¡žã€‚
+- **æ ¹æœ¬åŽŸå› **ï¼š
+  1. `isolation_test.go` æœ‰ `// +build !race` æ ‡ç­¾ï¼Œå¯¼è‡´æµ‹è¯•åœ¨ GitHub Actions ä¸Šè¢«è·³è¿‡ï¼Œä½† check æ¡†æž¶ä»ç»Ÿè®¡äº†è¿™äº›æµ‹è¯•
+  2. `TestWriteWriteConflict` æµ‹è¯•ä¸­ï¼Œ10ä¸ªå¹¶å‘ goroutine é«˜é¢‘è°ƒç”¨ `SetWithRetry` å’Œ `GetWithRetry`
+  3. é‡è¯•å¾ªçŽ¯ä¸­æ²¡æœ‰å»¶è¿Ÿï¼Œå¯¼è‡´æ— é™åˆ¶çš„é«˜é¢‘é‡è¯•é€ æˆ leveldb é”ç«žäº‰
+  4. é”™è¯¯ç±»åž‹æ–­è¨€è¿‡äºŽä¸¥æ ¼ï¼š`c.Assert(kv.IsTxnRetryableError(err) || terror.ErrorEqual(err, terror.ErrResultUndetermined), IsTrue)`ï¼Œå½“å‡ºçŽ°å…¶ä»–ç±»åž‹é”™è¯¯æ—¶ç›´æŽ¥å¤±è´¥è€Œä¸æ˜¯é‡è¯•
+- **æŽ’æŸ¥è¿‡ç¨‹**ï¼š
+  1. åˆ†æžå †æ ˆè·Ÿè¸ªï¼Œå‘çŽ° goroutine å¡åœ¨ `newIterator -> db.NewIterator -> acquireSnapshot -> Mutex.Lock`
+  2. å‘çŽ° `SetFinalizer` ä¹Ÿåœ¨ç«žäº‰åŒä¸€ä¸ªé”ï¼Œå¯¼è‡´æ­»é”
+  3. æŸ¥çœ‹ GitHub Actions æ—¥å¿—ï¼Œå‘çŽ° isolation_test ä¸­çš„æµ‹è¯•å®Œå…¨æ²¡æœ‰è¿è¡Œ
+  4. ç¡®è®¤ `// +build !race` æ ‡ç­¾å¯¼è‡´æµ‹è¯•è¢«è·³è¿‡
+  5. åœ¨ test_results.txt ä¸­æ‰¾åˆ°å¤±è´¥ç‚¹ï¼š`TestWriteWriteConflict` çš„é”™è¯¯æ–­è¨€å¤±è´¥
+- **è§£å†³æ–¹æ¡ˆ**ï¼š
+  1. **ç§»é™¤ `// +build !race` æ ‡ç­¾** - è®©æµ‹è¯•åœ¨æ‰€æœ‰çŽ¯å¢ƒä¸‹éƒ½èƒ½è¿è¡Œ
+  2. **åœ¨ `SetWithRetry` é‡è¯•å¾ªçŽ¯ä¸­æ·»åŠ  100 å¾®ç§’å»¶è¿Ÿ** - å‡å°‘é”ç«žäº‰é¢‘çŽ‡
+  3. **åœ¨ `GetWithRetry` é‡è¯•å¾ªçŽ¯ä¸­æ·»åŠ  100 å¾®ç§’å»¶è¿Ÿ** - å‡å°‘å¹¶å‘åŽ‹åŠ›
+  4. **åœ¨ `TestReadWriteConflict` çš„è¯»å–å¾ªçŽ¯ä¸­æ·»åŠ  5 å¾®ç§’å»¶è¿Ÿ** - é™ä½Ž goroutine ä¹‹é—´çš„ç«žäº‰
+  5. **ç§»é™¤ä¸¥æ ¼çš„é”™è¯¯ç±»åž‹æ–­è¨€** - æ”¹ä¸ºåœ¨ä»»ä½•é”™è¯¯æ—¶éƒ½é‡è¯•ï¼Œè€Œä¸æ˜¯æ–­è¨€å¤±è´¥
+  6. **ç§»é™¤æœªä½¿ç”¨çš„ imports**ï¼ˆ`kv` å’Œ `terror` åŒ…ï¼‰- ä¿®å¤ç¼–è¯‘é”™è¯¯
+  7. **ä¿®å¤ Makefile** - æ·»åŠ é”™è¯¯å¤„ç†ç¡®ä¿æµ‹è¯•å¤±è´¥æ—¶æ­£ç¡®æ¸…ç† failpoint
 
-## ËÄ¡¢×îÖÕÑéÖ¤
-- Í¨¹ýËùÓÐÁ½½×¶ÎÌá½»Ïà¹Ø²âÊÔ£¬°üÀ¨Ö÷¼ü commit Òì³£¡¢Ð´Ð´³åÍ»µÈ¡£
-- ´úÂëÂß¼­ÇåÎú£¬´íÎó´¦Àí·Ö²ãºÏÀí¡£
+## å››ã€æœ€ç»ˆéªŒè¯
+- é€šè¿‡æ‰€æœ‰ä¸¤é˜¶æ®µæäº¤ç›¸å…³æµ‹è¯•ï¼ŒåŒ…æ‹¬ä¸»é”® commit å¼‚å¸¸ã€å†™å†™å†²çªç­‰ã€‚
+- ä»£ç é€»è¾‘æ¸…æ™°ï¼Œé”™è¯¯å¤„ç†åˆ†å±‚åˆç†ã€‚
 
 ---
 
-# ×Ü½á
-Lab3 µÄÊµÏÖ¹ý³ÌÖÐ£¬ºËÐÄÄÑµãÔÚÓÚÒì³£´¦ÀíµÄÏ¸ÖÂÇø·ÖºÍ²âÊÔÇý¶¯µÄ·´¸´µ÷ÊÔ¡£Í¨¹ý·ÖÎö²âÊÔÓÃÀý¡¢¾«È·¶¨Î»ÎÊÌâ¡¢Öð²½ÐÞÕýÂß¼­£¬×îÖÕÊµÏÖÁË·Ö²¼Ê½ÊÂÎñµÄ½¡×³Á½½×¶ÎÌá½»¡£
+# æ€»ç»“
+Lab3 çš„å®žçŽ°è¿‡ç¨‹ä¸­ï¼Œæ ¸å¿ƒéš¾ç‚¹åœ¨äºŽå¼‚å¸¸å¤„ç†çš„ç»†è‡´åŒºåˆ†å’Œæµ‹è¯•é©±åŠ¨çš„åå¤è°ƒè¯•ã€‚é€šè¿‡åˆ†æžæµ‹è¯•ç”¨ä¾‹ã€ç²¾ç¡®å®šä½é—®é¢˜ã€é€æ­¥ä¿®æ­£é€»è¾‘ï¼Œæœ€ç»ˆå®žçŽ°äº†åˆ†å¸ƒå¼äº‹åŠ¡çš„å¥å£®ä¸¤é˜¶æ®µæäº¤ã€‚
