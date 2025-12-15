@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/pingcap/tidb/kv"
 	"github.com/pingcap/tidb/session"
@@ -122,12 +123,13 @@ func BenchmarkSelectWithoutIndex(b *testing.B) {
 	}
 
 	b.ResetTimer()
+	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		tk.MustExec("select * from users where age = 25")
 	}
+	elapsed := time.Since(start)
 	
-	elapsed := b.Elapsed().Seconds()
-	throughput := float64(b.N) / elapsed
+	throughput := float64(b.N) / elapsed.Seconds()
 	b.ReportMetric(throughput, "ops/sec")
 }
 
@@ -161,12 +163,13 @@ func BenchmarkSelectWithIndex(b *testing.B) {
 	tk.MustExec("create index idx_age on users(age)")
 
 	b.ResetTimer()
+	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		tk.MustExec("select * from users where age = 25")
 	}
+	elapsed := time.Since(start)
 	
-	elapsed := b.Elapsed().Seconds()
-	throughput := float64(b.N) / elapsed
+	throughput := float64(b.N) / elapsed.Seconds()
 	b.ReportMetric(throughput, "ops/sec")
 }
 
@@ -200,12 +203,13 @@ func BenchmarkAggregationWithIndex(b *testing.B) {
 	tk.MustExec("create index idx_user_status on orders(user_id, status)")
 
 	b.ResetTimer()
+	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		tk.MustExec("select user_id, sum(amount) from orders where status = 1 group by user_id")
 	}
+	elapsed := time.Since(start)
 	
-	elapsed := b.Elapsed().Seconds()
-	throughput := float64(b.N) / elapsed
+	throughput := float64(b.N) / elapsed.Seconds()
 	b.ReportMetric(throughput, "ops/sec")
 }
 
@@ -242,12 +246,13 @@ func BenchmarkJoinWithIndex(b *testing.B) {
 	tk.MustExec("create index idx_user_id on orders(user_id)")
 
 	b.ResetTimer()
+	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		tk.MustExec("select u.name, sum(o.amount) from users u join orders o on u.id = o.user_id group by u.id, u.name")
 	}
+	elapsed := time.Since(start)
 	
-	elapsed := b.Elapsed().Seconds()
-	throughput := float64(b.N) / elapsed
+	throughput := float64(b.N) / elapsed.Seconds()
 	b.ReportMetric(throughput, "ops/sec")
 }
 
@@ -272,6 +277,7 @@ func BenchmarkBatchInsert(b *testing.B) {
 	tk.MustExec("create table batch_test (id int primary key, value int)")
 
 	b.ResetTimer()
+	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		// Batch insert 10 rows at once
 		values := ""
@@ -284,9 +290,9 @@ func BenchmarkBatchInsert(b *testing.B) {
 		tk.MustExec("insert into batch_test values " + values)
 		tk.MustExec("delete from batch_test where id >= " + fmt.Sprintf("%d", i*10))
 	}
+	elapsed := time.Since(start)
 	
-	elapsed := b.Elapsed().Seconds()
-	throughput := float64(b.N*10) / elapsed // Insert 10 rows per iteration
+	throughput := float64(b.N*10) / elapsed.Seconds() // Insert 10 rows per iteration
 	b.ReportMetric(throughput, "rows/sec")
 }
 
@@ -320,12 +326,13 @@ func BenchmarkCompositeIndex(b *testing.B) {
 	tk.MustExec("create index idx_cat_price on products(category, price)")
 
 	b.ResetTimer()
+	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		// Query that benefits from composite index
 		tk.MustExec("select * from products where category = 5 and price > 200")
 	}
+	elapsed := time.Since(start)
 	
-	elapsed := b.Elapsed().Seconds()
-	throughput := float64(b.N) / elapsed
+	throughput := float64(b.N) / elapsed.Seconds()
 	b.ReportMetric(throughput, "ops/sec")
 }
