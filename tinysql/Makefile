@@ -262,25 +262,33 @@ tools/bin/golangci-lint:
 # 	$ make vectorized-bench VB_FILE=Time VB_FUNC=builtinCurrentDateSig
 vectorized-bench:
 	cd ./expression && \
-		go test -v -benchmem \
+		log_level=fatal go test -v -benchmem \
 			-bench=BenchmarkVectorizedBuiltin$(VB_FILE)Func \
 			-run=BenchmarkVectorizedBuiltin$(VB_FILE)Func \
 			-args "$(VB_FUNC)"
 
 lab3: failpoint-enable
-	go test -timeout 600s ./store/tikv || { $(FAILPOINT_DISABLE); exit 1; }
+	log_level=fatal go test -timeout 600s ./store/tikv || { $(FAILPOINT_DISABLE); exit 1; }
+	@$(FAILPOINT_DISABLE)
+
+bench-lab3: failpoint-enable
+	log_level=fatal go test -v -bench=Benchmark2PC -run="^$$" ./store/tikv || { $(FAILPOINT_DISABLE); exit 1; }
+	@$(FAILPOINT_DISABLE)
+
+bench-lab4: failpoint-enable
+	log_level=fatal go test -v -bench=Benchmark -run="^$$" ./executor || { $(FAILPOINT_DISABLE); exit 1; }
 	@$(FAILPOINT_DISABLE)
 
 
 lab4: lab4a lab4b lab4c
 
 lab4a: 
-	go test -timeout 600s ./server -check.f ^testSuiteLab4A$
-	go test -timeout 600s ./session -check.f ^lab4ASessionSuite$
+	log_level=fatal go test -timeout 600s ./server -check.f ^testSuiteLab4A$
+	log_level=fatal go test -timeout 600s ./session -check.f ^lab4ASessionSuite$
 
 lab4b: 
-	go test -timeout 600s ./executor -check.f ^testSuiteLab4B$
+	log_level=fatal go test -timeout 600s ./executor -check.f ^testSuiteLab4B$
 
 lab4c: 
-	go test -timeout 600s ./executor -check.f ^testSuiteLab4C$
+	log_level=fatal go test -timeout 600s ./executor -check.f ^testSuiteLab4C$
 

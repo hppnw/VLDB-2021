@@ -53,6 +53,9 @@ ci: default test
 format:
 	@gofmt -s -w `find . -name '*.go' -type f ! -path '*/_tools/*' -print`
 
+bench:
+	$(GO) test -bench=. ./kv/test_raftstore -run=^$
+
 project1:
 	$(GOTEST) ./kv/server -run 1 
 
@@ -105,6 +108,9 @@ clean:
 # The lab1 related tests. It's better to pass the part "a" tests and then try to
 # run the part "b" tests, as the part "a" tests are common path test without
 # failures or fault injections.
+lab1: GOTEST := $(GO) test --count=1 --parallel=1 -p=1
+lab1: lab1P0 lab1P1a lab1P1b lab1P2a lab1P2b lab1P3a lab1P3b lab1P4a lab1P4b
+
 lab1P0:
 	$(GOTEST) ./kv/server -run 1
 
@@ -141,6 +147,9 @@ lab1P4b:
 
 ###
 # The lab2 related tests.
+lab2: GOTEST := $(GO) test --count=1 --parallel=1 -p=1
+lab2: lab2P1 lab2P2 lab2P3 lab2P4
+
 lab2P1:
 	$(GOTEST) ./kv/transaction/commands -run Lab2P1
 
